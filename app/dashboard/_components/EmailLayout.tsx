@@ -5,19 +5,45 @@ import { Sidebar } from "./Sidebar";
 import { EmailList } from "./EmailList";
 import { EmailContent } from "./EmailContent";
 import { MailCompose } from "./MailCompose";
-import { sampleTickets } from "../data/sampleTickets";
-import { Separator } from "@radix-ui/react-separator";
+import { getAllEmailQueries } from "@/lib/email/fetch";
+
+interface EmailTicket {
+  ticket_no: string;
+  sender_email: string;
+  Subject: string;
+  request_type: string;
+  Thread: Array<{
+    message_id: string;
+    request_description: string;
+    email_body: string;
+    timestamp: string;
+    Reply: string | null;
+  }>;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function EmailLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTicketId, setSelectedTicketId] = useState<string | undefined>();
   const [isComposeOpen, setIsComposeOpen] = useState(false);
+  const [tickets, setTickets] = useState<EmailTicket[]>([]);
+
+  useEffect(() => {
+    async function loadEmails() {
+      const result = await getAllEmailQueries();
+      if (result?.data) {
+        setTickets(result.data);
+      }
+    }
+    loadEmails();
+  }, []);
 
   // Add keyboard shortcut for Command+O
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Check for Command+O (Mac) or Ctrl+O (Windows/Linux)
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "o") {
         event.preventDefault();
         setIsComposeOpen(true);
@@ -32,31 +58,27 @@ export default function EmailLayout() {
     setSearchQuery(query);
   };
 
-  const handleSelectTicket = (ticket: typeof sampleTickets[0]) => {
-    setSelectedTicketId(ticket._id.$oid);
+  const handleSelectTicket = (ticket: EmailTicket) => {
+    setSelectedTicketId(ticket.ticket_no);
   };
 
   const handleDelete = () => {
-    // TODO: Implement delete functionality
     console.log("Delete ticket:", selectedTicketId);
   };
 
   const handleForward = () => {
-    // TODO: Implement forward functionality
     console.log("Forward ticket:", selectedTicketId);
   };
 
   const handleSchedule = () => {
-    // TODO: Implement schedule functionality
     console.log("Schedule ticket:", selectedTicketId);
   };
 
   const handlePin = () => {
-    // TODO: Implement pin functionality
     console.log("Pin ticket:", selectedTicketId);
   };
 
-  const selectedTicket = sampleTickets.find(ticket => ticket._id.$oid === selectedTicketId);
+  const selectedTicket = tickets.find(ticket => ticket.ticket_no === selectedTicketId);
 
   return (
     <div className="flex h-screen w-full">

@@ -20,8 +20,12 @@ interface EmailContentProps {
       message_id: string;
       request_description: string;
       email_body: string;
-      timestamp: { $date: string };
+      timestamp: string;
+      Reply: string | null;
     }>;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
   };
 }
 

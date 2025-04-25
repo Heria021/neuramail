@@ -1,4 +1,8 @@
 import axios from 'axios';
+const api = axios.create({
+    baseURL: 'http://localhost:8000/api',
+    timeout: 10000,
+});
 
 interface ReplyToEmailPayload {
     ticket_id: string;
@@ -7,9 +11,9 @@ interface ReplyToEmailPayload {
     message_id: string;
 }
 
-async function replyToEmail(payload: ReplyToEmailPayload) {
+export async function replyToEmail(payload: ReplyToEmailPayload) {
     try {
-        const response = await axios.post('/api/response/reply-to-email', payload, {
+        const response = await api.post('/response/reply-to-email', payload, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
@@ -26,10 +30,9 @@ async function replyToEmail(payload: ReplyToEmailPayload) {
     }
 }
 
-
 export async function getFullEmailThread(ticket_id: string) {
     try {
-        const response = await axios.get('/api/response/get-full-thread', {
+        const response = await api.get('/response/get-full-thread', {
             params: { ticket_id },
             headers: {
                 Accept: 'application/json'
@@ -42,10 +45,9 @@ export async function getFullEmailThread(ticket_id: string) {
     }
 }
 
-
 export async function getLatestEmailThreads(ticket_id: string) {
     try {
-        const response = await axios.get('/api/response/get-latest-email-threads', {
+        const response = await api.get('/response/get-latest-email-threads', {
             params: { ticket_id },
             headers: {
                 Accept: 'application/json',

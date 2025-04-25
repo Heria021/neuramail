@@ -14,8 +14,12 @@ interface EmailTicketProps {
       message_id: string;
       request_description: string;
       email_body: string;
-      timestamp: { $date: string };
+      timestamp: string;
+      Reply: string | null;
     }>;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
   };
 }
 
@@ -24,7 +28,7 @@ export function EmailTicket({ ticket }: EmailTicketProps) {
   const senderFull = ticket.sender_email.split("<")[0].trim();
   const senderEmail = ticket.sender_email.match(/<([^>]+)>/)?.[1] || "";
   const formattedDate = format(
-    new Date(latestMessage.timestamp.$date),
+    new Date(latestMessage.timestamp),
     "PPpp"
   );
 
@@ -35,15 +39,13 @@ export function EmailTicket({ ticket }: EmailTicketProps) {
   };
 
   const handleSendReply = (message: string, attachments: File[]) => {
-    // TODO: Implement send reply functionality
     console.log("Sending reply:", { message, attachments });
     toast.success("Reply sent successfully");
   };
 
-  // Get previous messages for AI context
   const previousMessages = ticket.Thread.map(msg => 
     `Request: ${msg.request_description}\n\nMessage: ${msg.email_body}`
-  ).reverse(); // Reverse to show oldest messages first
+  ).reverse();
 
   return (
     <div className="flex flex-col h-full w-full bg-background">
@@ -67,8 +69,35 @@ export function EmailTicket({ ticket }: EmailTicketProps) {
 
       {/* Email Body */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 text-sm">
-        <p className="whitespace-pre-wrap">{latestMessage.request_description}</p>
-        <p className="whitespace-pre-wrap">{latestMessage.email_body}</p>
+        <div className="space-y-6">
+          {/* Latest Message */}
+          <div className="space-y-2">
+            <p className="whitespace-pre-wrap font-medium">Request: {latestMessage.request_description}</p>
+            <p className="whitespace-pre-wrap">{latestMessage.email_body}</p>
+          </div>
+
+          {/* Thread History */}
+          <div className="space-y-4">
+            {[...ticket.Thread].reverse().map((msg, index) => (
+              <div key={msg.message_id} className="relative pl-4 border-l-2 border-muted">
+                <div className="absolute left-0 top-0 w-2 h-2 rounded-full bg-muted-foreground -ml-1" />
+                <div className="space-y-2">
+                  <div className="text-xs text-muted-foreground">
+                    {format(new Date(msg.timestamp), "PPpp")}
+                  </div>
+                  <p className="whitespace-pre-wrap font-medium">Request: {msg.request_description}</p>
+                  <p className="whitespace-pre-wrap">{msg.email_body}</p>
+                  {msg.Reply && (
+                    <div className="mt-2 p-2 bg-muted rounded-md">
+                      <p className="text-xs font-medium mb-1">Reply:</p>
+                      <p className="whitespace-pre-wrap text-sm">{msg.Reply}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Reply Box */}
@@ -76,6 +105,9 @@ export function EmailTicket({ ticket }: EmailTicketProps) {
         recipientName={senderFull} 
         subject={ticket.Subject}
         previousMessages={previousMessages}
+        ticket_id={ticket.ticket_no}
+        message_id={latestMessage.message_id}
+        to_email={senderEmail}
         onSend={handleSendReply} 
       />
     </div>

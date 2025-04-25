@@ -5,10 +5,10 @@ const api = axios.create({
   timeout: 10000,
 });
 
-async function fetchEmails(keyword: string) {
+export async function fetchEmails(keyword?: string) {
   try {
     const response = await api.get('/email/emails', {
-      params: { keyword },
+      params: keyword ? { keyword } : {},
       headers: {
         'Accept': 'application/json'
       }
@@ -17,7 +17,7 @@ async function fetchEmails(keyword: string) {
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error('Axios error:', error.response?.data);
+      console.error('Axios error:', error.response?.data || error.message);
     } else {
       console.error('Unexpected error:', error);
     }

@@ -2,12 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 
 const Hero: React.FC = () => {
   return (
-    <section className="bg-background text-foreground py-20 text-center px-4">
+    <section className="bg-background text-foreground py-16 text-center px-4">
       <h1 className="text-3xl md:text-5xl lg:text-6xl font-semibold max-w-5xl mx-auto mb-6">
         Revolutionize Your Email Management with AI-Powered Replies
       </h1>
@@ -16,7 +15,7 @@ const Hero: React.FC = () => {
       </p>
       <div className="flex justify-center gap-4">
         <Link
-          href="/request-demo"
+          href="/dashboard"
         >
           <ShimmerButton className="shadow-2xl ">
             <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">

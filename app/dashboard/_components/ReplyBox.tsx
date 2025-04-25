@@ -4,12 +4,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Send, Upload, Wand2 } from "lucide-react";
 import { generateEmailReply } from "@/lib/ai";
+import { replyToEmail } from "@/lib/email/response";
 import { toast } from "sonner";
 
 interface ReplyBoxProps {
   recipientName: string;
   subject?: string;
   previousMessages?: string[];
+  ticket_id: string;
+  message_id: string;
+  to_email: string;
   onSend?: (message: string, attachments: File[]) => void;
 }
 
@@ -17,6 +21,9 @@ export function ReplyBox({
   recipientName, 
   subject = "Re: Email", 
   previousMessages = [], 
+  ticket_id,
+  message_id,
+  to_email,
   onSend 
 }: ReplyBoxProps) {
   const [message, setMessage] = useState("");
@@ -27,6 +34,33 @@ export function ReplyBox({
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setAttachments([...attachments, ...Array.from(e.target.files)]);
+    }
+  };
+
+  const handleReply = async () => {
+    if (!message.trim()) {
+      toast.error("Please enter a message");
+      return;
+    }
+
+    try {
+      const payload = {
+        ticket_id,
+        to_email,
+        body: message,
+        message_id,
+      };
+
+      const response = await replyToEmail(payload);
+      if (response) {
+        toast.success("Reply sent successfully");
+        setMessage("");
+        setAttachments([]);
+        onSend?.(message, attachments);
+      }
+    } catch (error) {
+      console.error("Error sending reply:", error);
+      toast.error("Failed to send reply. Please try again.");
     }
   };
 
@@ -99,6 +133,7 @@ export function ReplyBox({
             variant="outline"
             size="icon"
             onClick={() => document.getElementById("file-upload")?.click()}
+            className="cursor-pointer"
           >
             <Upload className="h-4 w-4" />
           </Button>
@@ -107,15 +142,17 @@ export function ReplyBox({
             size="icon"
             onClick={handleAIClick}
             disabled={isGeneratingAI}
+            className="cursor-pointer"
           >
             <Wand2 className="h-4 w-4" />
           </Button>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">Draft</Button>
+          <Button variant="outline" className="cursor-pointer">Draft</Button>
           <Button
-            onClick={isAIMode ? generateAIReply : () => onSend?.(message, attachments)}
+            onClick={isAIMode ? generateAIReply : handleReply}
             disabled={!message.trim() || isGeneratingAI}
+            className="cursor-pointer"
           >
             {isGeneratingAI ? (
               <>
