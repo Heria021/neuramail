@@ -5,44 +5,38 @@ import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   return (
-    <nav className={cn(
-      "w-full bg-black/90 text-white",
-      "sticky top-0 z-50 backdrop-blur-sm"
+    <header className={cn(
+      "w-full bg-background/60 text-foreground",
+      "sticky top-4 z-50 backdrop-blur-sm"
     )}>
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between py-4">
-          {/* Logo + Nav Links */}
+      <nav className="container max-w-7xl mx-auto px-2">
+        <div className="flex items-center justify-between py-6">
+          {/* Logo & Navigation */}
           <div className="flex items-center space-x-8">
             <Link 
               href="/" 
-              className="text-xl font-bold hover:text-gray-300 transition-colors"
+              className="text-xl font-bold hover:text-primary transition-colors"
               aria-label="Go to homepage"
             >
-              Applied Labs
+              NeuraMail
             </Link>
-            <div className="hidden md:flex space-x-6">
-              <Link href="/products" className="hover:text-gray-300 transition-colors">Products</Link>
-              <Link href="/solutions" className="hover:text-gray-300 transition-colors">Solutions</Link>
-              <Link href="/blog" className="hover:text-gray-300 transition-colors">Blog</Link>
-              <Link href="/company" className="hover:text-gray-300 transition-colors">Company</Link>
+            <div className="hidden md:flex space-x-6 text-sm font-medium">
+              <Link href="/products" className="hover:text-muted-foreground transition-colors">Products</Link>
+              <Link href="/solutions" className="hover:text-muted-foreground transition-colors">Solutions</Link>
+              <Link href="/blog" className="hover:text-muted-foreground transition-colors">Blog</Link>
+              <Link href="/company" className="hover:text-muted-foreground transition-colors">Company</Link>
             </div>
           </div>
 
-          {/* Auth + CTA */}
-          <div className="flex items-center space-x-4">
+          {/* Auth & CTA */}
+          <div className="flex items-center space-x-2">
             <Button variant="ghost" asChild>
               <Link href="/signin">Sign in</Link>
             </Button>
-            <Button variant="default" asChild>
-              <Link href="/contact-sales">
-                Contact sales
-                <span className="ml-2">→</span>
-              </Link>
-            </Button>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 };
 

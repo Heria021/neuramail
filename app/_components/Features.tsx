@@ -9,14 +9,17 @@ import { PlatformFeature } from './features/PlatformFeature';
 import { featureData } from './features/data';
 import { AuroraBackground } from '@/components/ui/aurora-background';
 
-const Features = () => {
+type ScrollDirection = 'up' | 'down';
+
+const Features: React.FC = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     dragFree: true,
-    containScroll: 'trimSnaps'
+    containScroll: 'trimSnaps',
   });
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
+
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [scrollDirection, setScrollDirection] = useState<ScrollDirection>('down');
 
   const scrollTo = useCallback(
     (index: number) => {
@@ -46,31 +49,37 @@ const Features = () => {
     setScrollDirection(e.deltaY > 0 ? 'down' : 'up');
   }, []);
 
-  const featureComponents = useMemo(() => [
-    <OmniFeature key="omni" />,
-    <GuidanceFeature key="guidance" />,
-    <PlatformFeature key="platform" />,
-  ], []);
+  const featureComponents = useMemo(
+    () => [
+      <OmniFeature key="omni" />,
+      <GuidanceFeature key="guidance" />,
+      <PlatformFeature key="platform" />,
+    ],
+    []
+  );
 
-  const renderFeatureCarousel = useCallback((index: number) => (
-    <motion.div
-      key={index}
-      className="min-w-full flex flex-col items-center gap-4 px-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{
-        duration: 0.8,
-        delay: index * 0.2,
-        ease: 'easeInOut',
-      }}
-    >
-      {featureComponents[index]}
-    </motion.div>
-  ), [featureComponents]);
+  const renderFeatureCarousel = useCallback(
+    (index: number) => (
+      <motion.div
+        key={index}
+        className="min-w-full flex flex-col items-center gap-4 px-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{
+          duration: 0.8,
+          delay: index * 0.2,
+          ease: 'easeInOut',
+        }}
+      >
+        {featureComponents[index]}
+      </motion.div>
+    ),
+    [featureComponents]
+  );
 
   return (
     <motion.section
-      className="bg-background text-white py-16 px-4"
+      className="bg-background text-foreground py-16 px-4"
       onWheel={handleScroll}
       animate={{
         scale: scrollDirection === 'down' ? 1.05 : 1,
@@ -88,14 +97,15 @@ const Features = () => {
             <motion.button
               key={feature.key}
               onClick={() => scrollTo(feature.scrollToIndex)}
-              className={`flex flex-col items-center justify-center p-4 rounded-lg transition-opacity duration-300 ${selectedIndex === feature.scrollToIndex
+              className={`flex flex-col items-center justify-center p-4 rounded-lg transition-opacity duration-300 ${
+                selectedIndex === feature.scrollToIndex
                   ? 'opacity-100'
                   : 'opacity-50 hover:opacity-80'
-                }`}
+              }`}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
             >
-              <feature.icon className="h-6 w-6" />
+              <feature.icon className="h-6 w-6 text-foreground" />
               <p className="text-sm font-medium mt-2">{feature.title}</p>
               <p className="text-xs text-muted-foreground text-center">
                 {feature.description}
@@ -105,22 +115,22 @@ const Features = () => {
         </div>
 
         {/* Carousel */}
-          <motion.div
-            className="overflow-hidden w-full"
-            ref={emblaRef}
-            animate={{
-              scale: scrollDirection === 'down' ? 1.05 : 1,
-              opacity: scrollDirection === 'down' ? 0.95 : 1,
-            }}
-            transition={{
-              duration: 0.5,
-              ease: 'easeInOut',
-            }}
-          >
-            <div className="flex">
-              {featureComponents.map((_, index) => renderFeatureCarousel(index))}
-            </div>
-          </motion.div>
+        <motion.div
+          className="overflow-hidden w-full"
+          ref={emblaRef}
+          animate={{
+            scale: scrollDirection === 'down' ? 1.05 : 1,
+            opacity: scrollDirection === 'down' ? 0.95 : 1,
+          }}
+          transition={{
+            duration: 0.5,
+            ease: 'easeInOut',
+          }}
+        >
+          <div className="flex">
+            {featureComponents.map((_, index) => renderFeatureCarousel(index))}
+          </div>
+        </motion.div>
       </div>
     </motion.section>
   );

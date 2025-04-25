@@ -19,9 +19,11 @@ export const PlatformFeature = ({ className }: FeatureComponentProps) => (
         />
       </CardContent>
     </Card>
-    <div className="text-white text-center space-y-4 mb-8 max-w-4xl p-2 mx-auto ">
-      <p className="text-3xl font-semibold">Cores Beind NeuraMail</p>
-      <p className=' text-foreground text-base '>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellat rem tempore pariatur dolore, labore asperiores libero, minima quisquam excepturi perspiciatis eligendi dicta dolorem vero.</p>
+    <div className="text-white text-center space-y-4 mb-8 max-w-4xl p-2 mx-auto">
+      <p className="text-4xl font-semibold text-primary">Platform for Efficient Communication</p>
+      <p className="text-foreground text-base">
+        NeuraMail offers a powerful platform designed for businesses to streamline email replies, integrate AI, and enhance communication through intelligent features.
+      </p>
     </div>
   </>
 ); 

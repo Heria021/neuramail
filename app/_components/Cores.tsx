@@ -6,40 +6,41 @@ import { GlowingEffect } from "@/components/ui/glowing-effect";
 export function Cores() {
   return (
     <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:max-h-[34rem] xl:grid-rows-2">
+
       <GridItem
         area="md:[grid-area:1/1/2/7] xl:[grid-area:1/1/2/5]"
         icon={<Box className="h-4 w-4 text-black dark:text-neutral-400" />}
         title="AI-Powered Email Replies"
-        description="NeuraMail quickly generates intelligent email replies, saving time and effort for users."
+        description="NeuralMail uses advanced AI models to craft personalized email replies based on context, saving time and improving email engagement."
       />
 
       <GridItem
         area="md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]"
         icon={<Settings className="h-4 w-4 text-black dark:text-neutral-400" />}
         title="Seamless Sentinal Integration"
-        description="Integrates with Sentinal for firms, automating responses based on company-specific knowledge."
+        description="Integrates with Sentinal to automate responses tailored to company-specific policies and knowledge, ensuring consistency and compliance."
       />
-
       <GridItem
         area="md:[grid-area:2/1/3/7] xl:[grid-area:1/5/3/8]"
         icon={<Lock className="h-4 w-4 text-black dark:text-neutral-400" />}
-        title="Security at Its Best"
-        description="Advanced encryption and security measures to ensure your emails and data are protected."
+        title="Intelligent Reply Customization"
+        description="With NeuralMail, customize replies based on company policies, employee tone, and AI-generated suggestions for efficient, consistent communication."
       />
 
       <GridItem
         area="md:[grid-area:2/7/3/13] xl:[grid-area:1/8/2/13]"
         icon={<Sparkles className="h-4 w-4 text-black dark:text-neutral-400" />}
-        title="Smooth and Efficient Workflow"
-        description="NeuraMail delivers a smooth experience with quick responses and a user-friendly interface."
+        title="Efficient Email Management"
+        description="NeuralMail’s dashboard allows users to track and respond to emails with ease, offering a smooth and intuitive workflow for busy professionals."
       />
 
       <GridItem
         area="md:[grid-area:3/1/4/13] xl:[grid-area:2/8/3/13]"
         icon={<Search className="h-4 w-4 text-black dark:text-neutral-400" />}
-        title="Coming Soon: New Features"
-        description="NeuraMail is continuously evolving with new AI features and integrations to enhance productivity."
+        title="Custom Reply, AI or Sentinal"
+        description="Choose between custom replies, AI-generated responses, or replies based on Sentinal, enabling flexible email management tailored to your needs."
       />
+
     </ul>
   );
 }
@@ -68,10 +69,10 @@ const GridItem = ({ area, icon, title, description }: GridItemProps) => {
               {icon}
             </div>
             <div className="space-y-3">
-              <h3 className="-tracking-4 pt-0.5 font-sans text-xl/[1.375rem] font-semibold text-balance text-black md:text-2xl/[1.875rem] dark:text-white">
+              <h3 className="-tracking-4 pt-0.5 font-sans text-xl/[1.375rem] font-semibold text-balance text-primary md:text-2xl/[1.875rem] dark:text-white">
                 {title}
               </h3>
-              <h2 className="font-sans text-sm/[1.125rem] text-black md:text-base/[1.375rem] dark:text-neutral-400 [&_b]:md:font-semibold [&_strong]:md:font-semibold">
+              <h2 className="font-sans text-sm dark:text-neutral-400 [&_b]:md:font-semibold [&_strong]:md:font-semibold">
                 {description}
               </h2>
             </div>

@@ -1,25 +1,35 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ShimmerButton } from '@/components/magicui/shimmer-button';
 
-const Hero = () => {
+const Hero: React.FC = () => {
   return (
-    <div className="bg-black text-white py-20 text-center">
-      <h1 className="text-7xl font-normal max-w-4xl mx-auto mb-6">
-        The complete platform for trusted AI customer support
+    <section className="bg-background text-foreground py-20 text-center px-4">
+      <h1 className="text-3xl md:text-5xl lg:text-6xl font-semibold max-w-5xl mx-auto mb-6">
+        Revolutionize Your Email Management with AI-Powered Replies
       </h1>
-      <p className="text-gray-400 max-w-3xl mx-auto mb-8">
-        Resolve support issues accurately with AI trained on your knowledge and workflows. Then, get
-        reports on top support topics of the week to focus on what matters most to your customers.
+      <p className="text-muted-foreground max-w-3xl mx-auto mb-8 text-sm">
+        NeuraMail automates your email replies with AI, integrating seamlessly with your company’s knowledge base. Boost productivity with smart, context-aware responses that save time and improve efficiency.
       </p>
-      <Link
-        href="/contact-sales"
-        className="bg-white text-black px-6 py-3 rounded-lg hover:bg-gray-100 inline-flex items-center"
-      >
-        Contact sales →
-      </Link>
-      <p className="text-gray-500 mt-4">100,000+ tasks automated</p>
-    </div>
+      <div className="flex justify-center gap-4">
+        <Link
+          href="/request-demo"
+        >
+          <ShimmerButton className="shadow-2xl ">
+            <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
+              Get Started
+            </span>
+          </ShimmerButton>
+        </Link>
+      </div>
+      <p className="text-muted-foreground mt-4 text-sm">
+        Join 100,000+ businesses automating their communication with NeuraMail
+      </p>
+    </section>
   );
 };
 
-export default Hero; 
+export default Hero;

@@ -1,10 +1,9 @@
-"use client"
-import React, { useEffect, useState } from 'react';
-import { Sun, Moon, Monitor } from 'lucide-react';
-import { cn } from "@/lib/utils";
-import { Badge } from '@/components/ui/badge';
-import { useTheme } from 'next-themes';
-import { Button } from '@/components/ui/button';
+"use client";
+import React, { useEffect, useState } from "react";
+import { Sun, Moon, Monitor } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
 
 type FooterLinkProps = {
   href: string;
@@ -20,7 +19,7 @@ const FooterLink: React.FC<FooterLinkProps> = ({ href, children }) => (
   <li>
     <a
       href={href}
-      className="text-gray-400 hover:text-white text-sm transition-colors"
+      className="hover:text-secondary-foreground text-muted-foreground text-sm transition-colors"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -31,25 +30,39 @@ const FooterLink: React.FC<FooterLinkProps> = ({ href, children }) => (
 
 const FooterSection: React.FC<FooterSectionProps> = ({ title, children }) => (
   <div>
-    <h3 className="text-lg font-semibold mb-4">{title}</h3>
+    <h3 className="text-lg font-bold text-primary transition-colors">{title}</h3>
     <ul className="space-y-2">
       {children}
     </ul>
   </div>
 );
 
-
 const Footer: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // Only enable theme switching after component mounts
   }, []);
-  
+
+  const toggleTheme = () => {
+    if (theme === "dark") {
+      setTheme("light");
+    } else if (theme === "light") {
+      setTheme("dark");
+    } else {
+      setTheme("system");
+    }
+  };
+
+  const getThemeIcon = () => {
+    if (theme === "dark") return <Sun className="h-4 w-4" />;
+    if (theme === "light") return <Moon className="h-4 w-4" />;
+    return <Monitor className="h-4 w-4" />;
+  };
+
   return (
-    <footer className="bg-background text-white py-4 border-t">
+    <footer className="bg-background py-4 border-t">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
           <FooterSection title="Products">
@@ -91,18 +104,18 @@ const Footer: React.FC = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    onClick={toggleTheme}
                     className="h-9 w-9 rounded-full flex items-center justify-center"
                   >
-                    {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                    {getThemeIcon()}
                   </Button>
                 )}
               </div>
-              <Badge variant={'outline'} className=' rounded-full border-border'>
+              <Badge variant={"outline"} className="rounded-full border-border">
                 <span className="w-2 h-2 bg-emerald-400 rounded-full" />
                 Beta Join
               </Badge>
-              <span className="text-sm text-gray-600">© Sentinal Mails 2025</span>
+              <span className="text-sm text-muted-foreground ">© Sentinal Mails 2025</span>
             </div>
           </div>
         </div>
