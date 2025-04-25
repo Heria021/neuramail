@@ -3,15 +3,25 @@ import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Send, Upload, Wand2 } from "lucide-react";
+import { generateEmailReply } from "@/lib/ai";
+import { toast } from "sonner";
 
 interface ReplyBoxProps {
   recipientName: string;
+  subject?: string;
+  previousMessages?: string[];
   onSend?: (message: string, attachments: File[]) => void;
 }
 
-export function ReplyBox({ recipientName, onSend }: ReplyBoxProps) {
+export function ReplyBox({ 
+  recipientName, 
+  subject = "Re: Email", 
+  previousMessages = [], 
+  onSend 
+}: ReplyBoxProps) {
   const [message, setMessage] = useState("");
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [isAIMode, setIsAIMode] = useState(false);
   const [attachments, setAttachments] = useState<File[]>([]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,16 +31,40 @@ export function ReplyBox({ recipientName, onSend }: ReplyBoxProps) {
   };
 
   const generateAIReply = async () => {
+    if (!subject || previousMessages.length === 0) {
+      toast.error("No context available for AI generation");
+      return;
+    }
+
     setIsGeneratingAI(true);
+    const toastId = toast.loading("Generating AI reply...");
+    
     try {
-      // TODO: Implement AI reply generation
-      const aiResponse = "AI-generated response will appear here...";
-      setMessage(aiResponse);
+      const response = await generateEmailReply({
+        subject,
+        previousMessages,
+        tone: "professional"
+      });
+
+      if (response.error) {
+        toast.error(response.error, { id: toastId });
+      } else if (response.content) {
+        setMessage(response.content);
+        toast.success("AI reply generated successfully", { id: toastId });
+      } else {
+        toast.error("No content generated", { id: toastId });
+      }
     } catch (error) {
       console.error("Error generating AI reply:", error);
+      toast.error("Failed to generate AI reply. Please try again.", { id: toastId });
     } finally {
       setIsGeneratingAI(false);
+      setIsAIMode(false);
     }
+  };
+
+  const handleAIClick = () => {
+    setIsAIMode(true);
   };
 
   return (
@@ -71,7 +105,7 @@ export function ReplyBox({ recipientName, onSend }: ReplyBoxProps) {
           <Button
             variant="outline"
             size="icon"
-            onClick={generateAIReply}
+            onClick={handleAIClick}
             disabled={isGeneratingAI}
           >
             <Wand2 className="h-4 w-4" />
@@ -80,11 +114,25 @@ export function ReplyBox({ recipientName, onSend }: ReplyBoxProps) {
         <div className="flex gap-2">
           <Button variant="outline">Draft</Button>
           <Button
-            onClick={() => onSend?.(message, attachments)}
-            disabled={!message.trim()}
+            onClick={isAIMode ? generateAIReply : () => onSend?.(message, attachments)}
+            disabled={!message.trim() || isGeneratingAI}
           >
-            Send
-            <Send className="ml-2 h-4 w-4" />
+            {isGeneratingAI ? (
+              <>
+                <Wand2 className="mr-2 h-4 w-4" />
+                Generating...
+              </>
+            ) : isAIMode ? (
+              <>
+                <Wand2 className="mr-2 h-4 w-4" />
+                Generate
+              </>
+            ) : (
+              <>
+                <Send className="mr-2 h-4 w-4" />
+                Send
+              </>
+            )}
           </Button>
         </div>
       </div>

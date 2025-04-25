@@ -1,5 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
+# .gitignore
+# Remove or comment out this line if you want Cursor to stop blocking it
+# .env
 # dependencies
 /node_modules
 /.pnp

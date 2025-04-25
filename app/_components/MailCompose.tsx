@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { Send, X, Upload, Save, Wand2 } from "lucide-react";
 import { toast } from "sonner";
+import { generateEmailReply } from "@/lib/ai";
 
 interface MailComposeProps {
   open: boolean;
@@ -23,6 +24,8 @@ export function MailCompose({ open, onOpenChange }: MailComposeProps) {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [isAIMode, setIsAIMode] = useState(false);
 
   const handleSend = () => {
     // TODO: Implement send functionality
@@ -46,13 +49,32 @@ export function MailCompose({ open, onOpenChange }: MailComposeProps) {
   };
 
   const handleAIWrite = async () => {
-    // TODO: Implement AI writing functionality
-    toast.loading("Generating email content...");
-    // Simulate AI writing
-    setTimeout(() => {
-      setBody("Here's a professionally written email...");
-      toast.success("Email content generated successfully");
-    }, 2000);
+    setIsGeneratingAI(true);
+    const toastId = toast.loading("Generating email content...");
+    try {
+      const response = await generateEmailReply({
+        subject: subject || "New Email",
+        previousMessages: [body],
+        tone: "professional"
+      });
+
+      if (response.error) {
+        toast.error(response.error, { id: toastId });
+      } else {
+        setBody(response.content);
+        toast.success("Email content generated successfully", { id: toastId });
+      }
+    } catch (error) {
+      console.error("Error generating email content:", error);
+      toast.error("Failed to generate email content. Please try again.", { id: toastId });
+    } finally {
+      setIsGeneratingAI(false);
+      setIsAIMode(false);
+    }
+  };
+
+  const handleAIClick = () => {
+    setIsAIMode(true);
   };
 
   return (
@@ -104,7 +126,7 @@ export function MailCompose({ open, onOpenChange }: MailComposeProps) {
                 <Save className="mr-2 h-4 w-4" />
                 Save Draft
               </Button>
-              <Button variant="outline" size="sm" onClick={handleAIWrite}>
+              <Button variant="outline" size="sm" onClick={handleAIClick} disabled={isGeneratingAI}>
                 <Wand2 className="mr-2 h-4 w-4" />
                 AI Write
               </Button>
@@ -128,9 +150,23 @@ export function MailCompose({ open, onOpenChange }: MailComposeProps) {
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSend}>
-                <Send className="mr-2 h-4 w-4" />
-                Send
+              <Button onClick={isAIMode ? handleAIWrite : handleSend} disabled={isGeneratingAI}>
+                {isGeneratingAI ? (
+                  <>
+                    <Wand2 className="mr-2 h-4 w-4" />
+                    Generating...
+                  </>
+                ) : isAIMode ? (
+                  <>
+                    <Wand2 className="mr-2 h-4 w-4" />
+                    Generate
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Send
+                  </>
+                )}
               </Button>
             </div>
           </div>

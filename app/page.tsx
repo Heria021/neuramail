@@ -1,10 +1,8 @@
-import Image from "next/image";
 import EmailLayout from "./_components/EmailLayout";
-
-export default function Home() {
+export default async function Home() {
   return (
     <div className="w-full h-full">
-      <EmailLayout/>
+      <EmailLayout />
     </div>
   );
 }

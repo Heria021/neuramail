@@ -2,6 +2,7 @@
 import { format } from "date-fns";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ReplyBox } from "./ReplyBox";
+import { toast } from "sonner";
 
 interface EmailTicketProps {
   ticket: {
@@ -36,7 +37,13 @@ export function EmailTicket({ ticket }: EmailTicketProps) {
   const handleSendReply = (message: string, attachments: File[]) => {
     // TODO: Implement send reply functionality
     console.log("Sending reply:", { message, attachments });
+    toast.success("Reply sent successfully");
   };
+
+  // Get previous messages for AI context
+  const previousMessages = ticket.Thread.map(msg => 
+    `Request: ${msg.request_description}\n\nMessage: ${msg.email_body}`
+  ).reverse(); // Reverse to show oldest messages first
 
   return (
     <div className="flex flex-col h-full w-full bg-background">
@@ -65,7 +72,12 @@ export function EmailTicket({ ticket }: EmailTicketProps) {
       </div>
 
       {/* Reply Box */}
-      <ReplyBox recipientName={senderFull} onSend={handleSendReply} />
+      <ReplyBox 
+        recipientName={senderFull} 
+        subject={ticket.Subject}
+        previousMessages={previousMessages}
+        onSend={handleSendReply} 
+      />
     </div>
   );
 }
