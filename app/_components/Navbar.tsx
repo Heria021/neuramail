@@ -31,7 +31,7 @@ const Navbar = () => {
           {/* Auth & CTA */}
           <div className="flex items-center space-x-2">
             <Button variant="ghost" asChild>
-              <Link href="/signin">Sign in</Link>
+              <Link href="/auth/signIn">Sign in</Link>
             </Button>
           </div>
         </div>

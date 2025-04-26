@@ -32,6 +32,22 @@ interface SidebarProps {
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
   onComposeClick?: () => void;
+  onSelectEmail?: (ticket: {
+    ticket_no: string;
+    sender_email: string;
+    Subject: string;
+    request_type: string;
+    Thread: Array<{
+      message_id: string;
+      request_description: string;
+      email_body: string;
+      timestamp: string;
+      Reply: string | null;
+    }>;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  }) => void;
 }
 
 // Constants
@@ -46,7 +62,7 @@ const NAV_ITEMS = [
   { icon: Send, label: "Sent", count: 0 }
 ];
 
-export function Sidebar({ sidebarCollapsed, setSidebarCollapsed, onComposeClick }: SidebarProps) {
+export function Sidebar({ sidebarCollapsed, setSidebarCollapsed, onComposeClick, onSelectEmail }: SidebarProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -170,7 +186,7 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed, onComposeClick 
         {!sidebarCollapsed ? (
           <>
             {/* <PlanCard /> */}
-            <AIAssistantCard />
+            <AIAssistantCard onSelectEmail={onSelectEmail} />
           </>
         ) : (
           <div className="flex justify-center flex-col gap-2">

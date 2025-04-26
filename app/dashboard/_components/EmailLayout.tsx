@@ -86,6 +86,7 @@ export default function EmailLayout() {
         sidebarCollapsed={sidebarCollapsed} 
         setSidebarCollapsed={setSidebarCollapsed}
         onComposeClick={() => setIsComposeOpen(true)}
+        onSelectEmail={(ticket) => setSelectedTicketId(ticket.ticket_no)}
       />
 
       <ResizablePanelGroup direction="horizontal" className="flex-1">

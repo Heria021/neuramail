@@ -8,7 +8,26 @@ import { useState } from "react";
 import { Bot, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function AIAssistantCard() {
+interface AIAssistantCardProps {
+  onSelectEmail?: (ticket: {
+    ticket_no: string;
+    sender_email: string;
+    Subject: string;
+    request_type: string;
+    Thread: Array<{
+      message_id: string;
+      request_description: string;
+      email_body: string;
+      timestamp: string;
+      Reply: string | null;
+    }>;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  }) => void;
+}
+
+export function AIAssistantCard({ onSelectEmail }: AIAssistantCardProps) {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [reply, setReply] = useState<AIResponse | null>(null);
@@ -107,7 +126,8 @@ export function AIAssistantCard() {
                   {reply.matchedEmails.map((email) => (
                     <div
                       key={email.ticket_no}
-                      className="text-xs p-2 rounded-md bg-muted/50"
+                      className="text-xs p-2 rounded-md bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
+                      onClick={() => onSelectEmail?.(email)}
                     >
                       <p className="font-medium">{email.Subject}</p>
                       <p className="text-muted-foreground">{email.sender_email}</p>
