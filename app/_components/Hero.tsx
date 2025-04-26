@@ -7,7 +7,8 @@ import { ShimmerButton } from '@/components/magicui/shimmer-button';
 const Hero: React.FC = () => {
   return (
     <section className="bg-background text-foreground py-16 text-center px-4">
-      <h1 className="text-3xl md:text-5xl lg:text-6xl font-semibold max-w-5xl mx-auto mb-6">
+      {/* <h1 className="text-3xl md:text-5xl lg:text-6xl font-semibold max-w-5xl mx-auto mb-6"> */}
+      <h1 className="relative z-10 text-lg md:text-6xl max-w-6xl mx-auto bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600  text-center font-sans font-bold">
         Revolutionize Your Email Management with AI-Powered Replies
       </h1>
       <p className="text-muted-foreground max-w-3xl mx-auto mb-8 text-sm">

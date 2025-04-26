@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export function PlanCard() {
   return (
-    <Card className="bg-muted">
+    <Card className="bg-muted gap-2">
       <CardHeader className="text-sm font-medium">Basic Plan</CardHeader>
       <CardContent>
         <p className="text-sm">0 / 15 messages remaining</p>

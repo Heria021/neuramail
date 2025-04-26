@@ -63,7 +63,7 @@ export function EmailList({
   );
 
   return (
-    <div className={`border-r p-4 ${className}`}>
+    <div className={`border-r p-4 h-screen overflow-hidden flex flex-col ${className}`}>
       <div className="flex items-center gap-2">
         <Search className="w-4 h-4" />
         <Input
@@ -76,7 +76,7 @@ export function EmailList({
 
       <Separator className="my-4" />
 
-      <div className="mt-4 space-y-2">
+      <div className="mt-4 space-y-2 overflow-y-auto hide-scrollbar">
         {filteredTickets.length > 0 ? (
           filteredTickets.map((ticket) => {
             const senderName = ticket.sender_email.split("<")[0].trim();

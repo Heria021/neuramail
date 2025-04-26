@@ -32,10 +32,10 @@ export default function Home() {
       <section className="mx-auto my-20 w-full">
         <div className="max-w-7xl mx-auto">
           <div className="text-center space-y-4 mb-8 max-w-4xl p-2 mx-auto">
-            <h2 className="text-5xl font-semibold text-primary">
+            <h2 className="text-5xl bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600  text-center font-sans font-bold">
               The Core Features Behind NeuralMail
             </h2>
-            <p className="text-muted-foreground text-base max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-sm max-w-2xl mx-auto">
               NeuralMail is designed to revolutionize your email management. With powerful AI, seamless integrations, and top-notch security, these core features make NeuralMail your ultimate email assistant.
             </p>
           </div>

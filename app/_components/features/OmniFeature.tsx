@@ -21,7 +21,7 @@ export const OmniFeature = ({ className }: FeatureComponentProps) => (
     </Card>
     <div className="text-center space-y-4 mb-8 max-w-4xl p-2 mx-auto">
       <p className="text-4xl font-semibold text-primary">Organize Your Mails</p>
-      <p className="text-foreground text-base">
+      <p className="text-foreground text-sm">
         Efficiently list and store all your incoming emails. NeuralMail provides an intuitive dashboard for easy access and management of your communications.
       </p>
     </div>

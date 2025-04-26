@@ -43,7 +43,7 @@ export function EmailTicket({ ticket }: EmailTicketProps) {
     toast.success("Reply sent successfully");
   };
 
-  const previousMessages = ticket.Thread.map(msg => 
+  const previousMessages = ticket.Thread.map(msg =>
     `Request: ${msg.request_description}\n\nMessage: ${msg.email_body}`
   ).reverse();
 
@@ -78,7 +78,7 @@ export function EmailTicket({ ticket }: EmailTicketProps) {
 
           {/* Thread History */}
           <div className="space-y-4">
-            {[...ticket.Thread].reverse().map((msg, index) => (
+            {[...ticket.Thread].reverse().slice(1).map((msg, index) => (
               <div key={msg.message_id} className="relative pl-4 border-l-2 border-muted">
                 <div className="absolute left-0 top-0 w-2 h-2 rounded-full bg-muted-foreground -ml-1" />
                 <div className="space-y-2">
@@ -101,14 +101,14 @@ export function EmailTicket({ ticket }: EmailTicketProps) {
       </div>
 
       {/* Reply Box */}
-      <ReplyBox 
-        recipientName={senderFull} 
+      <ReplyBox
+        recipientName={senderFull}
         subject={ticket.Subject}
         previousMessages={previousMessages}
         ticket_id={ticket.ticket_no}
         message_id={latestMessage.message_id}
         to_email={senderEmail}
-        onSend={handleSendReply} 
+        onSend={handleSendReply}
       />
     </div>
   );

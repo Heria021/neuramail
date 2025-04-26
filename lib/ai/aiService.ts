@@ -248,7 +248,7 @@ Consider the following when determining relevance:
     console.log(matchedEmails)
 
     return {
-      content: completion.choices[0]?.message?.content || 'No response generated',
+      content: parsedResponse.ai_reply || 'No response generated',
       matchedEmails,
     };
   } catch (error) {

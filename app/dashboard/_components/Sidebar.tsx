@@ -25,6 +25,7 @@ import {
 // Custom Components
 import { PlanCard } from "./PlanCard";
 import { AIAssistantCard } from "./AIAssistantCard";
+import { FlipText } from "@/components/magicui/flip-text";
 
 // Types
 interface SidebarProps {
@@ -145,12 +146,14 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed, onComposeClick 
     >
       <div>
         {/* Collapse Button */}
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-between items-center ">
+          <FlipText className={`text-xl font-bold -tracking-widest text-black dark:text-white ${sidebarCollapsed ? `hidden` : `block`}`}>
+            NEURAMAIL
+          </FlipText>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="h-8 w-8 flex items-center justify-center"
           >
             {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
@@ -166,7 +169,7 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed, onComposeClick 
         {/* Cards Section */}
         {!sidebarCollapsed ? (
           <>
-            <PlanCard />
+            {/* <PlanCard /> */}
             <AIAssistantCard />
           </>
         ) : (
