@@ -11,10 +11,13 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { signUpUser } from "@/lib/auth/signinUser";
+import { useState } from "react";
+import { Eye, EyeOff, Mail, UserPlus } from "lucide-react";
+import axios from "axios";
 
 const signUpSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -24,10 +27,13 @@ const signUpSchema = z.object({
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 interface SignUpFormProps {
-    onSignUpSuccess: (email: string) => void;
+    onSignUpSuccess: (email: string, password: string) => void;
 }
 
 export default function SignUpForm({ onSignUpSuccess }: SignUpFormProps) {
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
     const signUpForm = useForm<SignUpFormValues>({
         resolver: zodResolver(signUpSchema),
         defaultValues: {
@@ -36,58 +42,129 @@ export default function SignUpForm({ onSignUpSuccess }: SignUpFormProps) {
         },
     });
 
-
     const handleSignUp: SubmitHandler<FieldValues> = async (data) => {
+        setIsLoading(true);
         try {
-            const response = await signUpUser({ email: data.email, password: data.password });
-            if (response.status === "success") {
-                onSignUpSuccess(data.email);
-                toast.success("Success!", {
-                    description: "Check your email for the confirmation code.",
+            // Call the Next.js API route for sign-up
+            const response = await axios.post('/api/auth/sign-up', {
+                email: data.email,
+                password: data.password
+            });
+
+            if (response.data.status === "success") {
+                onSignUpSuccess(data.email, data.password);
+                toast.success("Account created", {
+                    description: "Please check your email for the verification code.",
                 });
             } else {
-                toast.error("Error!", {
-                    description: "This email already exists. Please try another one.",
+                toast.error("Registration failed", {
+                    description: response.data.message || "This email may already be registered.",
                 });
             }
         } catch (error) {
-            toast.error("Error!", {
-                description: "You don't have an account. Please create one.",
+            console.error("Failed to sign up:", error);
+
+            // Handle axios error responses
+            const errorMessage = axios.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : "We couldn't create your account. Please try again later.";
+
+            toast.error("Registration failed", {
+                description: errorMessage,
             });
+        } finally {
+            setIsLoading(false);
         }
     };
 
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
-        <Form {...signUpForm}>
-            <form onSubmit={signUpForm.handleSubmit(handleSignUp)} className="grid gap-4">
-                <FormField
-                    control={signUpForm.control}
-                    name="email"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                                <Input {...field} placeholder="Email" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={signUpForm.control}
-                    name="password"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                                <Input {...field} type="password" placeholder="Password" />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <Button type="submit" className="mt-4 rounded-xl">Sign Up</Button>
-            </form>
-        </Form>
+        <div>
+            <Form {...signUpForm}>
+                <form onSubmit={signUpForm.handleSubmit(handleSignUp)} className="space-y-5">
+                    <FormField
+                        control={signUpForm.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Email</FormLabel>
+                                <FormControl>
+                                    <div className="relative">
+                                        <Input
+                                            {...field}
+                                            placeholder="you@example.com"
+                                            type="email"
+                                            disabled={isLoading}
+                                            className="pl-10"
+                                            autoComplete="email"
+                                        />
+                                        <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    </div>
+                                </FormControl>
+                                <FormDescription>
+                                    We'll send a verification code to this email
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={signUpForm.control}
+                        name="password"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Password</FormLabel>
+                                <FormControl>
+                                    <div className="relative">
+                                        <Input
+                                            {...field}
+                                            type={showPassword ? "text" : "password"}
+                                            placeholder="••••••••"
+                                            disabled={isLoading}
+                                            autoComplete="new-password"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={togglePasswordVisibility}
+                                            className="absolute right-3 top-2.5 text-muted-foreground"
+                                            tabIndex={-1}
+                                        >
+                                            {showPassword ?
+                                                <EyeOff className="h-4 w-4" /> :
+                                                <Eye className="h-4 w-4" />
+                                            }
+                                        </button>
+                                    </div>
+                                </FormControl>
+                                <FormDescription>
+                                    Must be at least 6 characters
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <Button
+                        type="submit"
+                        className="w-full mt-8"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <span className="flex items-center">
+                                <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent"></span>
+                                Creating account...
+                            </span>
+                        ) : (
+                            <span className="flex items-center">
+                                <UserPlus className="mr-2 h-4 w-4" />
+                                Create Account
+                            </span>
+                        )}
+                    </Button>
+                </form>
+            </Form>
+        </div>
     );
 }

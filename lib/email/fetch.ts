@@ -13,7 +13,6 @@ export async function fetchEmails(keyword?: string) {
         'Accept': 'application/json'
       }
     });
-    console.log('Emails:', response.data);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -31,7 +30,6 @@ export async function getAllEmailQueries() {
         'Accept': 'application/json'
       }
     });
-    console.log('All Queries:', response.data);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

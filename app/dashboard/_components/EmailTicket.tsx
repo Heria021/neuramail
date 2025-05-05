@@ -79,7 +79,7 @@ export function EmailTicket({ ticket }: EmailTicketProps) {
           {/* Thread History */}
           <div className="space-y-4">
             {[...ticket.Thread].reverse().slice(1).map((msg, index) => (
-              <div key={msg.message_id} className="relative pl-4 border-l-2 border-muted">
+              <div key={index} className="relative pl-4 border-l-2 border-muted">
                 <div className="absolute left-0 top-0 w-2 h-2 rounded-full bg-muted-foreground -ml-1" />
                 <div className="space-y-2">
                   <div className="text-xs text-muted-foreground">
