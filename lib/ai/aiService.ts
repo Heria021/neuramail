@@ -187,7 +187,7 @@ Please provide a response in the following JSON format:
     }
   ],
   "total_relevant": number, // Total number of relevant emails found
-  "ai_reply": "string" // A natural language response to the user's query, incorporating information from the relevant emails
+  "ai_reply": "string" // A concise but high-quality response that answers the user's query with relevant facts and insights from the emails, without mentioning ticket numbers or technical identifiers
 }
 
 Instructions:
@@ -196,11 +196,20 @@ Instructions:
 3. Provide a clear, concise summary for each relevant email
 4. If no emails are relevant, return an empty relevant_tickets array
 5. Do not include any non-relevant emails in the response
-6. Generate a natural, conversational AI reply that:
-   - Directly addresses the user's query
-   - References the relevant emails by their ticket numbers
-   - Provides a helpful and informative response
-   - Maintains a professional and friendly tone
+5a. Do not mention ticket numbers or technical identifiers in the ai_reply
+6. Generate a comprehensive, high-quality AI reply that:
+   - Directly addresses the user's query with specific details and facts
+   - References relevant emails by their subject and sender instead of ticket numbers
+   - Includes key information from each email without technical identifiers
+   - Provides concrete data points, dates, and specific content from the emails when relevant
+   - Organizes information in a clear, structured manner with proper context
+   - Highlights important patterns or insights across multiple emails if applicable
+   - Maintains a professional and friendly tone while being thorough and precise
+   - Includes quantitative information where available (dates, numbers, statistics)
+   - Summarizes complex information in an easily digestible format
+   - Keeps responses concise but informative (around 3-5 sentences for simple queries)
+   - Focuses on the most relevant information without unnecessary details
+   - Uses natural language that an end-user would understand and find helpful
 
 Consider the following when determining relevance:
 - The subject and content of the emails
@@ -212,8 +221,8 @@ Consider the following when determining relevance:
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
       model: "gpt-3.5-turbo",
-      temperature: 0.7,
-      max_tokens: 1000,
+      temperature: 0.5,
+      max_tokens: 1500,
     });
 
     const aiContent = completion.choices[0]?.message?.content || '';

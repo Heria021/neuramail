@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import {
   Search, Bot, Mail, FileText, Send, Terminal,
   ChevronLeft, ChevronRight, Sun, Moon,
-  PenBox
+  PenBox, LogOut, User, Settings
 } from "lucide-react";
 
 // UI Components
@@ -21,6 +22,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Custom Components
 import { PlanCard } from "./PlanCard";
@@ -63,8 +72,20 @@ const NAV_ITEMS = [
 ];
 
 export function Sidebar({ sidebarCollapsed, setSidebarCollapsed, onComposeClick, onSelectEmail }: SidebarProps) {
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
+  const handleSignOut = () => {
+    // Clear authentication data
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user_email");
+    localStorage.removeItem("login_id");
+    localStorage.removeItem("remember_user");
+
+    // Redirect to sign-in page
+    router.push("/auth/sign-in");
+  };
 
   // Handle window resize for auto-collapse
   useEffect(() => {
@@ -136,24 +157,51 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed, onComposeClick,
   );
 
   // Render user profile section
-  const renderUserProfile = () => (
-    <div className={`flex items-center gap-2 ${sidebarCollapsed ? 'justify-center' : ''}`}>
-      <Avatar className={sidebarCollapsed ? 'h-8 w-8' : ''}>
-        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-        <AvatarFallback>CN</AvatarFallback>
-      </Avatar>
-      {mounted && !sidebarCollapsed && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className="h-9 w-9 rounded-full flex items-center justify-center"
-        >
-          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
-      )}
-    </div>
-  );
+  const renderUserProfile = () => {
+    // Get user email from localStorage
+    let userEmail = "";
+    try {
+      userEmail = localStorage.getItem("user_email") || "user@example.com";
+    } catch (error) {
+      console.error("Error accessing localStorage:", error);
+    }
+
+    // Get initials for avatar
+    const initials = userEmail
+      .split('@')[0]
+      .substring(0, 2)
+      .toUpperCase();
+
+    return (
+      <div className={`flex items-center gap-2 ${sidebarCollapsed ? 'justify-center' : ''}`}>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar className={`${sidebarCollapsed ? 'h-8 w-8' : ''} cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all`}>
+              <AvatarImage src="https://github.com/shadcn.png" alt="User Profile" />
+              <AvatarFallback>{initials}</AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push("/profile")} className="cursor-pointer">
+              <User className="mr-2 h-4 w-4" />
+              <span>Update Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="cursor-pointer">
+              {theme === "dark" ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
+              <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive">
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Sign Out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    );
+  };
 
   return (
     <div
@@ -211,4 +259,4 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed, onComposeClick,
       </div>
     </div>
   );
-} 
+}

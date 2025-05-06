@@ -6,19 +6,27 @@ const api = axios.create({
 });
 
 // Define response types
-interface ProfileData {
+interface ProfileResponseData {
   profile_name: string;
   profile_email: string;
   auto_reply: boolean;
   assistant_id?: string;
   assistant_token?: string | null;
+  phone?: string;
 }
 
 interface CheckProfileResponse {
   status: "success" | "error";
   hasProfile: boolean;
-  profileData?: ProfileData;
+  profileData?: ProfileResponseData;
   message?: string;
+}
+
+interface ProfileData {
+  name: string;
+  email: string;
+  phone: string;
+  auto_reply: boolean;
 }
 
 export async function createProfile(profileData: any) {
@@ -29,7 +37,7 @@ export async function createProfile(profileData: any) {
       name: profileData.name,
       email: profileData.email,
       phone: profileData.phone,
-      auto_reply: profileData.autoreply,
+      auto_reply: profileData.auto_reply,
     };
 
     const response = await api.post('/profile/create-profile', formattedData, {
@@ -57,6 +65,25 @@ export async function createProfile(profileData: any) {
   }
 }
 
+
+export async function updateProfile(data: ProfileData) {
+  const token = localStorage.getItem("access_token");
+
+  try {
+    const response = await api.post('/profile/update-profile', data, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Profile update failed:", error);
+    throw error;
+  }
+}
 
 
 export async function checkUserProfile(token: string): Promise<CheckProfileResponse> {

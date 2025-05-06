@@ -2,16 +2,64 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import AuthLayout from "../auth/_components/AuthLayout";
-import AuthFooter from "../auth/_components/AuthFooter";
-import ProfileForm from "./_components/ProfileForm";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import ProfileLayout from "./_components/ProfileLayout";
+import ProfileSection from "./_components/ProfileSection";
+import RequestTypeSection from "./_components/RequestTypeSection";
+import AssistantTokenSection from "./_components/AssistantTokenSection";
+import { checkUserProfile } from "@/lib/user/profile";
 
+interface ProfileData {
+  profile_name: string;
+  profile_email: string;
+  auto_reply: boolean;
+  assistant_id: string | null;
+  assistant_token: string | null;
+  phone?: string;
+}
 
 export default function ProfilePage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [email, setEmail] = useState<string | null>(null);
+  const [hasProfile, setHasProfile] = useState(false);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+
+  const fetchProfileData = async () => {
+    setIsLoading(true);
+    try {
+      const accessToken = localStorage.getItem("access_token");
+
+      if (!accessToken) {
+        router.push("/auth/sign-in");
+        return;
+      }
+
+      const profileResponse = await checkUserProfile(accessToken);
+
+      if (profileResponse.status === "success") {
+        setHasProfile(profileResponse.hasProfile);
+        if (profileResponse.hasProfile && profileResponse.profileData) {
+          // Cast the profile data to match our interface
+          const typedProfileData: ProfileData = {
+            profile_name: profileResponse.profileData.profile_name,
+            profile_email: profileResponse.profileData.profile_email,
+            auto_reply: profileResponse.profileData.auto_reply,
+            assistant_id: profileResponse.profileData.assistant_id || null,
+            assistant_token: profileResponse.profileData.assistant_token || null,
+            phone: profileResponse.profileData.phone
+          };
+          setProfileData(typedProfileData);
+        }
+      } else {
+        console.error("Error fetching profile:", profileResponse.message);
+      }
+    } catch (error) {
+      console.error("Error checking profile:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Check if user is authenticated
@@ -26,12 +74,10 @@ export default function ProfilePage() {
       }
 
       setEmail(userEmail);
-      setIsLoading(false);
+      fetchProfileData();
     } catch (error) {
       console.error("Error checking authentication:", error);
       router.push("/auth/sign-in");
-    } finally {
-      setIsLoading(false);
     }
   }, [router]);
 
@@ -60,10 +106,35 @@ export default function ProfilePage() {
   }
 
   return (
-    <AuthLayout
-      title="Complete Your Profile"
-      subtitle="Tell us a bit more about yourself to get started">
-      <ProfileForm email={email} />
-    </AuthLayout>
+    <ProfileLayout
+      title="Profile Settings"
+      subtitle="Manage your profile information and settings">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="md:col-span-1">
+          <ProfileSection
+            email={email}
+            profileData={profileData}
+            hasProfile={hasProfile}
+            onProfileUpdate={fetchProfileData}
+            assistantTokenSetup={!!(profileData?.assistant_token)}
+          />
+        </div>
+
+        <div className="md:col-span-1 space-y-8">
+          <RequestTypeSection
+            hasProfile={hasProfile}
+            assistantId={profileData?.assistant_id || null}
+            onUpdate={fetchProfileData}
+          />
+
+          <AssistantTokenSection
+            hasProfile={hasProfile}
+            assistantId={profileData?.assistant_id || null}
+            assistantToken={profileData?.assistant_token || null}
+            onUpdate={fetchProfileData}
+          />
+        </div>
+      </div>
+    </ProfileLayout>
   );
 }

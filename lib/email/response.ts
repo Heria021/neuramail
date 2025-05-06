@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 const api = axios.create({
     baseURL: 'http://localhost:8000/api',
     timeout: 10000,
@@ -13,10 +14,12 @@ interface ReplyToEmailPayload {
 
 export async function replyToEmail(payload: ReplyToEmailPayload) {
     try {
+        const accessToken = localStorage.getItem('access_token');
         const response = await api.post('/response/reply-to-email', payload, {
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
             }
         });
         console.log('Reply Success:', response.data);
@@ -30,20 +33,6 @@ export async function replyToEmail(payload: ReplyToEmailPayload) {
     }
 }
 
-export async function getFullEmailThread(ticket_id: string) {
-    try {
-        const response = await api.get('/response/get-full-thread', {
-            params: { ticket_id },
-            headers: {
-                Accept: 'application/json'
-            }
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching email thread:', error);
-        throw error;
-    }
-}
 
 export async function getLatestEmailThreads(ticket_id: string) {
     try {
@@ -57,5 +46,25 @@ export async function getLatestEmailThreads(ticket_id: string) {
     } catch (error) {
         console.error('Error fetching latest email threads:', error);
         throw error;
+    }
+}
+
+export async function getFullEmailThread(ticket_id: string) {
+    try {
+        const accessToken = localStorage.getItem('access_token');
+        const response = await api.get('/response/get-full-thread', {
+            params: { ticket_id },
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.error('Axios error:', error.response?.data);
+        } else {
+            console.error('Unexpected error:', error);
+        }
     }
 }
