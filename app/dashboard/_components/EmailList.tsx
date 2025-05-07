@@ -3,8 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Search } from "lucide-react";
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
-import { fetchEmails, getAllEmailQueries } from "@/lib/email/fetch";
+import { useEffect, useState, useCallback } from "react";
+import { getAllEmailQueries } from "@/lib/email/fetch";
 import { Badge } from "@/components/ui/badge";
 
 interface EmailThread {
@@ -42,15 +42,19 @@ export function EmailList({
   const [searchQuery, setSearchQuery] = useState("");
   const [tickets, setTickets] = useState<EmailTicket[]>([]);
 
-  useEffect(() => {
-    async function loadEmails() {
-      const result = await getAllEmailQueries();
-      if (result?.data) {
-        setTickets(result.data);
-      }
+  // Function to load emails
+  const loadEmails = useCallback(async () => {
+    const result = await getAllEmailQueries();
+    if (result?.data) {
+      setTickets(result.data);
     }
-    loadEmails();
   }, []);
+
+
+  // Initial load of emails
+  useEffect(() => {
+    loadEmails();
+  }, [loadEmails]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);

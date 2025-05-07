@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
     baseURL: 'http://localhost:8000/api',
-    timeout: 60000, // 1 minute
+    timeout: 300000, // 5 minutes
 });
 
 export const sendAutomatedReply = async () => {

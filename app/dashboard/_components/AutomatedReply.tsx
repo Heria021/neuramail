@@ -2,16 +2,20 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Bot, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, CircleDot } from "lucide-react";
 import { toast } from "sonner";
 import { checkUserProfile } from "@/lib/user/profile";
 import { fetchEmails } from "@/lib/email/emails";
+import { sendAutomatedReply } from "@/lib/automated/automatedRespose";
 
 export default function AutomatedReply() {
-  const [isActive, setIsActive] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [status, setStatus] = useState<"idle" | "running" | "success" | "error">("idle");
+  const [operationType, setOperationType] = useState<"fetch" | "reply">("fetch");
+  const [hasValidToken, setHasValidToken] = useState<boolean>(false);
+  const [hasAutoReply, setHasAutoReply] = useState<boolean>(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const initialCheckDone = useRef<boolean>(false);
 
   const checkProfileAndSetup = async () => {
     setIsLoading(true);
@@ -19,8 +23,9 @@ export default function AutomatedReply() {
       const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
         console.warn("No access token found.");
-        setIsActive(false);
-        return;
+        setHasAutoReply(false);
+        setHasValidToken(false);
+        return false;
       }
 
       const profileResponse = await checkUserProfile(accessToken);
@@ -32,60 +37,118 @@ export default function AutomatedReply() {
         profileResponse.profileData
       ) {
         const { auto_reply, assistant_token } = profileResponse.profileData;
-        const shouldActivate = auto_reply && !!assistant_token;
-        console.log("Should activate:", shouldActivate);
-        setIsActive(shouldActivate);
+
+        // Set premium status based on profile data
+        const hasValidAssistantToken = !!assistant_token;
+        const hasAutoReplyEnabled = auto_reply;
+        console.log("hasValidToken", hasValidAssistantToken);
+        console.log("hasAutoReply", hasAutoReplyEnabled);
+        setHasValidToken(hasValidAssistantToken);
+        setHasAutoReply(hasAutoReplyEnabled);
+
+        // Log the premium feature state to help debug
+        console.log("Premium feature state:", {
+          hasValidToken: hasValidAssistantToken,
+          auto_reply: hasAutoReplyEnabled,
+        });
+
+        return { hasValidToken: hasValidAssistantToken, hasAutoReply: hasAutoReplyEnabled };
       } else {
         console.warn("Invalid profile data");
-        setIsActive(false);
+        setHasAutoReply(false);
+        setHasValidToken(false);
+        return false;
       }
     } catch (error) {
       console.error("Error checking profile:", error);
-      setIsActive(false);
+      setHasAutoReply(false);
+      setHasValidToken(false);
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const runAutomatedReply = async () => {
-    console.log("runAutomatedReply called - isActive:", isActive);
-    if (!isActive) return;
-
+  const runAutomatedReply = async (profileSettings?: { hasValidToken: boolean, hasAutoReply: boolean }) => {
+    setOperationType("fetch");
     setStatus("running");
-    try {
-      console.log("Calling fetchEmails...");
-      const result = await fetchEmails();
-      console.log("Fetched emails result:", result);
-      setStatus("success");
 
-      if (result && result.data && result.data.length > 0) {
-        toast.success(`Fetched ${result.data.length} emails successfully`);
+    try {
+      const result = await fetchEmails();
+      console.log(result);
+
+      // Use the passed profile settings or fall back to state values
+      const settings = profileSettings || { hasValidToken, hasAutoReply };
+
+      if (result && result.success && result.data.emails.email.length > 0) {
+        const emailCount = result.data.emails.email.length;
+        toast.success(`Fetched ${emailCount} emails successfully`);
+
+        // Log the current state to debug why automated reply might not be triggering
+        console.log("Automated reply check:", {
+          "hasValidToken": settings.hasValidToken,
+          "hasAutoReply": settings.hasAutoReply,
+        });
+
+        if (settings.hasValidToken && settings.hasAutoReply) {
+          setOperationType("reply");
+
+          try {
+            const replyResult = await sendAutomatedReply();
+            console.log("Automated reply result:", replyResult);
+            toast.success(`Processed ${emailCount} emails with automated replies`);
+            setStatus("success");
+          } catch (replyError) {
+            console.error("Error in automated reply:", replyError);
+            toast.error("Failed to send automated replies");
+            setStatus("error");
+          }
+        } else {
+          console.log("Not sending automated reply because:", {
+            "hasValidToken": settings.hasValidToken,
+            "hasAutoReply": settings.hasAutoReply,
+          });
+          setStatus("success");
+        }
       } else {
         toast.success("Email check completed. No new emails found.");
+        setStatus("success");
       }
+
     } catch (error) {
-      console.error("Error fetching emails:", error);
       setStatus("error");
       toast.error("Failed to fetch emails");
     } finally {
       setTimeout(() => {
+        setOperationType("fetch");
         setStatus("idle");
-      }, 3000);
+      }, 2000);
     }
   };
 
   const scheduleNextRun = () => {
     timeoutRef.current = setTimeout(() => {
       runAutomatedReply().finally(() => {
-        if (isActive) {
-          scheduleNextRun(); // continue only if still active
-        }
+        scheduleNextRun();
       });
-    }, 60000); // 1 minute after previous run completes
+    }, 60000); // 1 minute
   };
 
   useEffect(() => {
-    checkProfileAndSetup();
+    const initialize = async () => {
+      const profileSettings = await checkProfileAndSetup();
+
+      if (profileSettings) {
+        await runAutomatedReply(profileSettings);
+      } else {
+        await runAutomatedReply({ hasValidToken: false, hasAutoReply: false });
+      }
+
+      scheduleNextRun();
+      initialCheckDone.current = true;
+    };
+
+    initialize();
 
     return () => {
       if (timeoutRef.current) {
@@ -95,26 +158,6 @@ export default function AutomatedReply() {
     };
   }, []);
 
-  useEffect(() => {
-    if (isActive) {
-      runAutomatedReply().finally(() => {
-        scheduleNextRun();
-      });
-    } else {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    }
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    };
-  }, [isActive]);
-
   return (
     <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-muted/30">
       {isLoading && (
@@ -122,20 +165,32 @@ export default function AutomatedReply() {
       )}
 
       {status === "running" && (
-        <Loader2 className="h-3 w-3 animate-spin text-amber-500" />
+        <Loader2 className={`h-3 w-3 animate-spin ${operationType === "fetch" ? "text-amber-500" : "text-green-500"}`} />
       )}
+
       {status === "success" && (
         <CheckCircle2 className="h-3 w-3 text-green-500" />
       )}
+
       {status === "error" && (
         <XCircle className="h-3 w-3 text-red-500" />
       )}
 
+      {hasValidToken && (
+        <CircleDot className={`h-3 w-3 ${!hasAutoReply ? "text-red-500" : "text-blue-500"}`} />
+      )}
+
       <Badge
-        variant={isActive ? "default" : "outline"}
-        className={`text-xs px-2 py-0 h-5 ${isActive ? "bg-green-500 hover:bg-green-600" : "text-muted-foreground"}`}
+        variant="outline"
+        className={`text-xs px-2 py-0 h-5 transition-colors duration-300 ${
+          operationType === "reply"
+            ? "bg-green-500 text-white hover:bg-green-600"
+            : status === "running"
+              ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
+              : "text-muted-foreground"
+        }`}
       >
-        {isActive ? "Auto-fetch" : "Disabled"}
+        {operationType === "fetch" ? "Auto-Fetch" : "Auto-Reply"}
       </Badge>
     </div>
   );

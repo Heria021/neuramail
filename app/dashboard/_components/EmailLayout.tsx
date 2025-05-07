@@ -81,35 +81,35 @@ export default function EmailLayout() {
   const selectedTicket = tickets.find(ticket => ticket.ticket_no === selectedTicketId);
 
   return (
-    <div className="flex h-screen w-full">
-      <Sidebar 
-        sidebarCollapsed={sidebarCollapsed} 
-        setSidebarCollapsed={setSidebarCollapsed}
-        onComposeClick={() => setIsComposeOpen(true)}
-        onSelectEmail={(ticket) => setSelectedTicketId(ticket.ticket_no)}
-      />
+      <div className="flex h-screen w-full">
+        <Sidebar
+          sidebarCollapsed={sidebarCollapsed}
+          setSidebarCollapsed={setSidebarCollapsed}
+          onComposeClick={() => setIsComposeOpen(true)}
+          onSelectEmail={(ticket) => setSelectedTicketId(ticket.ticket_no)}
+        />
 
-      <ResizablePanelGroup direction="horizontal" className="flex-1">
-        <ResizablePanel defaultSize={30} minSize={20} maxSize={40}>
-          <EmailList 
-            onSearch={handleSearch} 
-            onSelectTicket={handleSelectTicket}
-            selectedTicketId={selectedTicketId}
-          />
-        </ResizablePanel>
-        <ResizableHandle />
-        <ResizablePanel defaultSize={70}>
-          <EmailContent
-            onDelete={handleDelete}
-            onForward={handleForward}
-            onSchedule={handleSchedule}
-            onPin={handlePin}
-            ticket={selectedTicket}
-          />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+        <ResizablePanelGroup direction="horizontal" className="flex-1">
+          <ResizablePanel defaultSize={30} minSize={20} maxSize={40}>
+            <EmailList
+              onSearch={handleSearch}
+              onSelectTicket={handleSelectTicket}
+              selectedTicketId={selectedTicketId}
+            />
+          </ResizablePanel>
+          <ResizableHandle />
+          <ResizablePanel defaultSize={70}>
+            <EmailContent
+              onDelete={handleDelete}
+              onForward={handleForward}
+              onSchedule={handleSchedule}
+              onPin={handlePin}
+              ticket={selectedTicket}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
 
-      <MailCompose open={isComposeOpen} onOpenChange={setIsComposeOpen} />
-    </div>
+        <MailCompose open={isComposeOpen} onOpenChange={setIsComposeOpen} />
+      </div>
   );
 }
