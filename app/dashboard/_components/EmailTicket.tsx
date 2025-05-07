@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { getFullEmailThread } from "@/lib/email/response";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { EmailOperationButtons } from "./EmailOperationButtons";
 
 interface ThreadMessage {
   message_id: string;
@@ -42,9 +43,19 @@ interface EmailTicketProps {
     createdAt: string;
     updatedAt: string;
   };
+  onDelete?: () => void;
+  onForward?: () => void;
+  onSchedule?: () => void;
+  onPin?: () => void;
 }
 
-export function EmailTicket({ ticket }: EmailTicketProps) {
+export function EmailTicket({
+  ticket,
+  onDelete,
+  onForward,
+  onSchedule,
+  onPin
+}: EmailTicketProps) {
   const [fullThread, setFullThread] = useState<ThreadData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -108,8 +119,16 @@ export function EmailTicket({ ticket }: EmailTicketProps) {
             </div>
           </div>
         </div>
-        <div className="text-xs text-muted-foreground whitespace-nowrap">
-          {formattedDate}
+        <div className="flex flex-col-reverse items-center gap-2">
+          <div className="text-xs text-muted-foreground whitespace-nowrap">
+            {formattedDate}
+          </div>
+          <EmailOperationButtons
+            onDelete={onDelete}
+            onForward={onForward}
+            onSchedule={onSchedule}
+            onPin={onPin}
+          />
         </div>
       </div>
 

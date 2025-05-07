@@ -1,8 +1,7 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Trash2, Forward, Clock, Pin } from "lucide-react";
 import { EmailTicket } from "./EmailTicket";
+import AutomatedReply from "./AutomatedReply";
 
 interface EmailContentProps {
   title?: string;
@@ -42,19 +41,8 @@ export function EmailContent({
     <div className={`flex flex-col h-full w-full ${className}`}>
       <div className="flex justify-between items-center p-4 border-b">
         <div className="text-xl font-semibold">{title}</div>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="icon" onClick={onDelete}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onForward}>
-            <Forward className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onSchedule}>
-            <Clock className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onPin}>
-            <Pin className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center gap-4">
+          <AutomatedReply />
         </div>
       </div>
 
@@ -62,7 +50,13 @@ export function EmailContent({
 
       <div className="flex-1 overflow-hidden">
         {ticket ? (
-          <EmailTicket ticket={ticket} />
+          <EmailTicket
+            ticket={ticket}
+            onDelete={onDelete}
+            onForward={onForward}
+            onSchedule={onSchedule}
+            onPin={onPin}
+          />
         ) : (
           <div className="h-full flex items-center justify-center text-muted-foreground">
             No message selected

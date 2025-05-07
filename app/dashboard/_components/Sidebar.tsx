@@ -32,7 +32,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 // Custom Components
-import { PlanCard } from "./PlanCard";
 import { AIAssistantCard } from "./AIAssistantCard";
 import { FlipText } from "@/components/magicui/flip-text";
 
@@ -233,7 +232,6 @@ export function Sidebar({ sidebarCollapsed, setSidebarCollapsed, onComposeClick,
         {/* Cards Section */}
         {!sidebarCollapsed ? (
           <>
-            {/* <PlanCard /> */}
             <AIAssistantCard onSelectEmail={onSelectEmail} />
           </>
         ) : (

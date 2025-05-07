@@ -2,12 +2,14 @@ import axios from 'axios';
 
 const api = axios.create({
     baseURL: 'http://localhost:8000/api',
-    timeout: 600000,  // 10 minutes
+    timeout: 60000, // 1 minute
 });
 
-const sendAutomatedReply = async () => {
+export const sendAutomatedReply = async () => {
     try {
         const accessToken = localStorage.getItem('access_token');
+        if (!accessToken) throw new Error("Access token not found in localStorage");
+
         const response = await api.post(
             'auto/response/automated-response/reply-to-email',
             {},
@@ -16,12 +18,17 @@ const sendAutomatedReply = async () => {
                     'accept': 'application/json',
                     'Authorization': `Bearer ${accessToken}`,
                 },
-                timeout: 600000,
             }
         );
 
         console.log(response.data);
+        return response.data;
     } catch (error) {
-        console.error('Error sending automated reply:', error);
+        if (axios.isAxiosError(error)) {
+            console.error('Axios error:', error.response?.data || error.message);
+        } else {
+            console.error('Unexpected error:', error);
+        }
+        throw error;
     }
 };
