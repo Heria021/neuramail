@@ -226,7 +226,7 @@ export function AIAssistantCard({ onSelectEmail }: AIAssistantCardProps) {
                         <Mail className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                         <p className="text-xs font-medium">Relevant emails ({reply.matchedEmails.length})</p>
                       </div>
-                      <div className="space-y-2 w-full">
+                      <div className="space-y-2 w-full overflow-y-auto max-h-[200px]">
                         {reply.matchedEmails.map((email) => (
                           <div
                             key={email.ticket_no}
@@ -236,7 +236,7 @@ export function AIAssistantCard({ onSelectEmail }: AIAssistantCardProps) {
                             <div className="flex justify-between items-start mb-1 w-full">
                               <p className="font-medium line-clamp-1 flex-1 mr-2 overflow-ellipsis overflow-hidden">{email.Subject}</p>
                               <Badge variant="outline" className="text-[10px] h-4 shrink-0 whitespace-nowrap">
-                                {email.status}
+                                {email.request_type}
                               </Badge>
                             </div>
                             <p className="text-muted-foreground flex items-center gap-1 w-full overflow-hidden">
